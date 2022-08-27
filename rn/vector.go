@@ -10,153 +10,200 @@ type Vec struct {
 	X []float64
 }
 
-func (p Vec) String() string {
-	return fmt.Sprintf("%v", p.X)
+func roundTo(n float64, decimals uint32) float64 {
+	return math.Round(n*math.Pow(10, float64(decimals))) / math.Pow(10, float64(decimals))
 }
 
-// VecN returns a Vec object that has length of n,
-// and all elements set to val
-func VecN(n int, val float64) Vec {
-	vslice := make([]float64, n)
-	for i := range vslice {
-		vslice[i] = val
+func (o Vec) String() (str string) {
+	for i := 0; i < o.N-1; i++ {
+		if i == 0 {
+			str += fmt.Sprintf("[%v, ", roundTo(o.X[i], 4))
+		} else {
+			str += fmt.Sprintf("%v, ", roundTo(o.X[i], 4))
+		}
 	}
-	return Vec{N: n, X: vslice}
+	str += fmt.Sprintf("%v]", roundTo(o.X[o.N-1], 4))
+	return
 }
 
-// VecEqual returns true if p.N == q.N and p.X == q.X
-func VecEqual(p, q Vec) bool {
-	if len(p.X) != len(q.X) || p.N != q.N {
+// MakeVec returns a Vec object that has length of n and all elements set to val
+func MakeVec(n int, val float64) (o Vec) {
+	if n < 1 {
+		panic(errNegativeDimension)
+	}
+	o = Vec{N: n, X: make([]float64, n)}
+	if val != 0 {
+		for i := range o.X {
+			o.X[i] = val
+		}
+	}
+	return
+}
+
+// Equal returns true if o.N == q.N and o.X == q.X
+func (o *Vec) Equal(q Vec) bool {
+	if o.N != q.N {
 		return false
 	}
-	for i, v := range p.X {
-		if v != q.X[i] {
+	if o.N < 1 || q.N < 1 {
+		panic(errZeroLengthVec)
+	}
+	for i, v := range o.X {
+		if v != q.X[i] && !(math.IsNaN(v) || math.IsNaN(q.X[i])) {
 			return false
 		}
 	}
 	return true
 }
 
-// At returns the value of p at index i
-func (p *Vec) At(i int) float64 {
-	if p.N <= i {
-		panic(ErrIndexOutOfRange)
+// Get returns the value of the vector o at index i
+func (o *Vec) Get(i int) float64 {
+	if o.N <= i {
+		panic(errVectorAccess)
 	}
-	return p.X[i]
+	return o.X[i]
 }
 
-// Set Sets the value of p[i] = val
-func (p *Vec) Set(i int, val float64) {
-	if p.N <= i {
-		panic(ErrIndexOutOfRange)
+// Set sets the value of o[i] = val
+func (o *Vec) Set(i int, val float64) {
+	if o.N <= i {
+		panic(errVectorAccess)
 	}
-	p.X[i] = val
+	o.X[i] = val
 }
 
-// SetSlice Copies the float64 slice s onto p.X
-func (p *Vec) SetSlice(s []float64) {
-	if p.N < len(s) {
-		panic(ErrSliceLengthMismatch)
+// SetSlice copies the float64 slice s onto o.X
+func (o *Vec) SetSlice(s []float64) {
+	if o.N < len(s) {
+		panic(errSliceLengthMismatch)
 	}
-	copy(p.X, s)
+	copy(o.X, s)
 }
 
-// Abs returns the absolute value of p
-func Abs(p Vec) Vec {
-	if len(p.X) < 1 {
-		panic(ErrZeroLengthVec)
+// Abs returns the absolute value of o
+func (o *Vec) Abs() (u Vec) {
+	if o.N < 1 {
+		panic(errZeroLengthVec)
 	}
-	u := Vec{N: len(p.X), X: make([]float64, len(p.X))}
-
+	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
-		u.Set(i, math.Abs(p.X[i]))
+		u.Set(i, math.Abs(o.X[i]))
 	}
-	return u
+	return
 }
 
-// Add returns the vector sum of p and q
-func Add(p, q Vec) Vec {
-	if len(p.X) != len(q.X) || p.N != q.N {
-		panic(ErrShape)
+// Add returns the vector sum of o and q
+func (o *Vec) Add(q Vec) (u Vec) {
+	if o.N != q.N {
+		panic(errShape)
 	}
-	u := Vec{N: len(p.X), X: make([]float64, len(p.X))}
-
+	if o.N < 1 || q.N < 1 {
+		panic(errZeroLengthVec)
+	}
+	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
-		u.Set(i, p.X[i]+q.X[i])
+		u.Set(i, o.X[i]+q.X[i])
 	}
-	return u
+	return
 }
 
-// Sub returns the vector sum of p and -q
-func Sub(p, q Vec) Vec {
-	if len(p.X) != len(q.X) || p.N != q.N {
-		panic(ErrShape)
+// Sub returns the vector sum of o and -q
+func (o *Vec) Sub(q Vec) (u Vec) {
+	if o.N != q.N {
+		panic(errShape)
 	}
-	u := Vec{N: len(p.X), X: make([]float64, len(p.X))}
-
+	if o.N < 1 || q.N < 1 {
+		panic(errZeroLengthVec)
+	}
+	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
-		u.Set(i, p.X[i]-q.X[i])
+		u.Set(i, o.X[i]-q.X[i])
 	}
-	return u
+	return
 }
 
-// Scale returns the vector p scaled by r
-func Scale(r float64, p Vec) Vec {
-	if len(p.X) < 1 {
-		panic(ErrZeroLengthVec)
+// Scale returns the vector o scaled by r
+func (o *Vec) Scale(r float64) (u Vec) {
+	if o.N < 1 {
+		panic(errZeroLengthVec)
 	}
-	u := Vec{N: len(p.X), X: make([]float64, len(p.X))}
-
+	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
-		u.Set(i, r*p.X[i])
+		u.Set(i, r*o.X[i])
 	}
-	return u
+	return
 }
 
-// Dot returns the dot product of p and q
-func Dot(p, q Vec) float64 {
-	if len(p.X) != len(q.X) || p.N != q.N {
-		panic(ErrShape)
+// Dot returns the dot product of o and q
+func (o *Vec) Dot(q Vec) (d float64) {
+	if o.N != q.N {
+		panic(errShape)
 	}
-	d := 0.0
-	for i := 0; i < len(p.X); i++ {
-		d += p.X[i] * q.X[i]
+	if o.N < 1 || q.N < 1 {
+		panic(errZeroLengthVec)
 	}
-	return d
+	for i := 0; i < o.N; i++ {
+		d += o.X[i] * q.X[i]
+	}
+	return
 }
 
-// Cross returns the cross product of p and q
-func Cross(p, q Vec) Vec {
-	if len(p.X) != len(q.X) || p.N != q.N {
-		panic(ErrShape)
+// Cross returns the cross product of o and q
+func (o *Vec) Cross(q Vec) (u Vec) {
+	if o.N != q.N {
+		panic(errShape)
 	}
-	switch p.N {
+	if o.N < 1 || q.N < 1 {
+		panic(errZeroLengthVec)
+	}
+	switch o.N {
 	default:
-		panic(ErrShape)
+		panic(errOrder)
 	case 3:
-		u := Vec{N: 3, X: make([]float64, 3)}
-		u.X[0] = (p.X[1] * q.X[2]) - (p.X[2] * q.X[1])
-		u.X[1] = (p.X[2] * q.X[0]) - (p.X[0] * q.X[2])
-		u.X[2] = (p.X[0] * q.X[1]) - (p.X[1] * q.X[0])
-		return u
+		u = Vec{N: 3, X: make([]float64, 3)}
+		u.X[0] = (o.X[1] * q.X[2]) - (o.X[2] * q.X[1])
+		u.X[1] = (o.X[2] * q.X[0]) - (o.X[0] * q.X[2])
+		u.X[2] = (o.X[0] * q.X[1]) - (o.X[1] * q.X[0])
+		return
 	}
 }
 
-// Norm returns the Euclidean norm of p
+// Norm returns the Euclidean norm of o
 //
-//	||p|| = sqrt(p · p)
-func Norm(p Vec) float64 {
-	return math.Sqrt(Dot(p, p))
+//	||o|| = sqrt(o · o)
+func (o *Vec) Norm() (nrm float64) {
+	nrm = math.Sqrt(o.Dot(*o))
+	return
 }
 
-// Dist returns the distance between p and q
+// Dist returns the distance between o and q
 //
-//	||q - p||
-func Dist(p, q Vec) float64 {
-	return Norm(Sub(p, q))
+//	||q - o||
+func (o *Vec) Dist(q Vec) (dist float64) {
+	sub := q.Sub(*o)
+	dist = sub.Norm()
+	return
 }
 
-// Cos returns the cosine of the opening angle between p and q
-func Cos(p, q Vec) float64 {
-	return Dot(p, q) / (Norm(p) * Norm(q))
+// Cos returns the cosine of the opening angle between o and q
+func (o *Vec) Cos(q Vec) (cos float64) {
+	cos = o.Dot(q) / (o.Norm() * q.Norm())
+	return
+}
+
+// Largest returns the largest component |a[ij]| of this vector and it's index
+func (o *Vec) Largest(begin, end int) (largest float64, idx int) {
+	if o.N < 1 {
+		panic(errZeroLengthVec)
+	}
+	largest = math.Abs(o.X[begin])
+	idx = begin
+	for k := begin + 1; k < o.N && k < end; k++ {
+		tmp := math.Abs(o.X[k])
+		if tmp > largest {
+			largest = tmp
+			idx = k
+		}
+	}
+	return
 }

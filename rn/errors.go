@@ -6,20 +6,20 @@ type Error struct{ string }
 func (err Error) Error() string { return err.string }
 
 var (
-	ErrPivot               = Error{"lin: malformed pivot list"}
-	ErrOrder               = Error{"lin: invalid order for matrix"}
-	ErrShape               = Error{"lin: dimension mismatch"}
-	ErrSquare              = Error{"lin: expect square matrix"}
-	ErrSingular            = Error{"lin: matrix is singular"}
-	ErrColLength           = Error{"lin: col length mismatch"}
-	ErrNormOrder           = Error{"lin: invalid norm order for matrix"}
-	ErrColAccess           = Error{"lin: column index out of range"}
-	ErrRowAccess           = Error{"lin: row index out of range"}
-	ErrRowLength           = Error{"lin: row length mismatch"}
-	ErrVectorAccess        = Error{"lin: vector index out of range"}
-	ErrZeroLengthMat       = Error{"lin: zero length in matrix dimension"}
-	ErrZeroLengthVec       = Error{"lin: zero length in vector dimension"}
-	ErrIndexOutOfRange     = Error{"lin: index out of range"}
-	ErrNegativeDimension   = Error{"lin: negative dimension"}
-	ErrSliceLengthMismatch = Error{"lin: input slice length mismatch"}
+	errPivot               = Error{"lin: malformed pivot list"}
+	errOrder               = Error{"lin: invalid order for matrix"}
+	errShape               = Error{"lin: dimension mismatch"}
+	errSquare              = Error{"lin: expect square matrix"}
+	errSingular            = Error{"lin: matrix is singular"}
+	errColLength           = Error{"lin: col length mismatch"}
+	errNormOrder           = Error{"lin: invalid norm order for matrix"}
+	errColAccess           = Error{"lin: column index out of range"}
+	errRowAccess           = Error{"lin: row index out of range"}
+	errRowLength           = Error{"lin: row length mismatch"}
+	errVectorAccess        = Error{"lin: vector index out of range"}
+	errZeroLengthMat       = Error{"lin: zero length in matrix dimension"}
+	errZeroLengthVec       = Error{"lin: zero length in vector dimension"}
+	errIndexOutOfRange     = Error{"lin: index out of range"}
+	errNegativeDimension   = Error{"lin: negative dimension"}
+	errSliceLengthMismatch = Error{"lin: input slice length mismatch"}
 )
