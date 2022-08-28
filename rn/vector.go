@@ -33,7 +33,7 @@ func (o Vec) String() (str string) {
 //
 // Returns:
 //
-//	Vec: Vec object with dimension n and all elements set to val
+//	vec Vec - Vec object with dimension n and all elements set to val
 func MakeVec(n int, val float64) (vec Vec) {
 	if n < 1 {
 		panic(errNegativeDimension)

@@ -2,7 +2,15 @@ package rn
 
 import "github.com/add1609/lin/scalar"
 
-// BackSubstitution takes an upper triangular matrix and returns it's solution vector x
+// BackSubstitution returns the solution vector x of an upper triangular matrix
+//
+// Parameters:
+//
+//	o *Mat - an upper triangular matrix
+//
+// Returns:
+//
+//	x Vec - the solution vector x
 func (o *Mat) BackSubstitution() (x Vec) {
 	uN := o.N - 1
 	x = MakeVec(uN, 0)
@@ -21,7 +29,16 @@ func (o *Mat) BackSubstitution() (x Vec) {
 	return
 }
 
-// GaussSolve solves a linear system using gaussian elimination
+// GaussSolve takes an upper triangular matrix and returns it's solution vector x
+//
+// Parameters:
+//
+//	o *Mat - an upper triangular matrix
+//
+// Returns:
+//
+//	mat Mat - the modified matrix
+//	x Vec - the solution vector x
 func (o *Mat) GaussSolve() (mat Mat, x Vec) {
 	var rowPivot, colPivot int
 	mat = o.GetCopy()
