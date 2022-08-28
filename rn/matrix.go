@@ -3,6 +3,8 @@ package rn
 import (
 	"fmt"
 	"math"
+
+	"github.com/add1609/lin/scalar"
 )
 
 // Mat implements a column-major representation of a matrix
@@ -25,27 +27,45 @@ func (o Mat) String() (str string) {
 			str += "\n"
 		}
 		for j := 0; j < o.N; j++ {
-			str += fmt.Sprintf("%9g ", roundTo(o.Get(i, j), 3))
+			str += fmt.Sprintf("%9g ", scalar.RoundTo(o.Get(i, j), 3))
 		}
 	}
 	return
 }
 
-// MakeMat returns a Mat object with row size of M, column size of N and all elements set to val
-func MakeMat(m, n int, val float64) (o Mat) {
+// MakeMat returns a new matrix with m rows and n columns and all elements set to val
+//
+// Parameters:
+//
+//	m int - number of rows
+//	n int - number of columns
+//	val float64 - value to initialize the matrix with
+//
+// Returns:
+//
+//	mat Mat - a new matrix with m rows and n columns and all elements set to val
+func MakeMat(m, n int, val float64) (mat Mat) {
 	if m < 1 || n < 1 {
 		panic(errNegativeDimension)
 	}
-	o = Mat{M: m, N: n, Data: make([]float64, m*n)}
+	mat = Mat{M: m, N: n, Data: make([]float64, m*n)}
 	if val != 0 {
-		for k := range o.Data {
-			o.Data[k] = val
+		for k := range mat.Data {
+			mat.Data[k] = val
 		}
 	}
 	return
 }
 
 // GetCopy returns a copy of this matrix
+//
+// Parameters:
+//
+//	o *Mat - matrix to copy
+//
+// Returns:
+//
+//	clone Mat - a copy of this matrix
 func (o *Mat) GetCopy() (clone Mat) {
 	if o.M < 1 || o.N < 1 {
 		panic(errZeroLengthVec)
@@ -55,8 +75,18 @@ func (o *Mat) GetCopy() (clone Mat) {
 	return
 }
 
-// Get gets the value at A[i][j]
-func (o *Mat) Get(i, j int) float64 {
+// Get returns the value at A[i][j]
+//
+// Parameters:
+//
+//	o *Mat - matrix to get value at A[i][j] of
+//	i int - row index
+//	j int - column index
+//
+// Returns:
+//
+//	val float64 - the value at A[i][j]
+func (o *Mat) Get(i, j int) (val float64) {
 	if o.M <= i {
 		panic(errRowAccess)
 	}
@@ -67,6 +97,17 @@ func (o *Mat) Get(i, j int) float64 {
 }
 
 // Set sets the value at A[i][j]
+//
+// Parameters:
+//
+//	o *Mat - matrix to set value at A[i][j] of
+//	i int - row index
+//	j int - column index
+//	val float64 - the value to set at A[i][j]
+//
+// Returns:
+//
+//	none
 func (o *Mat) Set(i, j int, val float64) {
 	if o.M <= i {
 		panic(errRowAccess)
@@ -78,6 +119,15 @@ func (o *Mat) Set(i, j int, val float64) {
 }
 
 // GetCol returns column j of this matrix
+//
+// Parameters:
+//
+//	o *Mat - matrix to get column j of
+//	j int - column index
+//
+// Returns:
+//
+//	col Vec - column j of this matrix
 func (o *Mat) GetCol(j int) (col Vec) {
 	if o.N <= j {
 		panic(errColAccess)
@@ -88,6 +138,16 @@ func (o *Mat) GetCol(j int) (col Vec) {
 }
 
 // SetCol sets the values of a column j to the values of a Vec v
+//
+// Parameters:
+//
+//	o *Mat - matrix to set column j of
+//	j int - column index
+//	v Vec - column values
+//
+// Returns:
+//
+//	none
 func (o *Mat) SetCol(j int, v Vec) {
 	if v.N != o.M {
 		panic(errColLength)
@@ -99,6 +159,15 @@ func (o *Mat) SetCol(j int, v Vec) {
 }
 
 // GetRow returns row i of this matrix
+//
+// Parameters:
+//
+//	o *Mat - matrix to get row i of
+//	i int - row index
+//
+// Returns:
+//
+//	row Vec - row i of this matrix
 func (o *Mat) GetRow(i int) (row Vec) {
 	if o.M < 1 || o.N < 1 {
 		panic(errNegativeDimension)
@@ -114,6 +183,16 @@ func (o *Mat) GetRow(i int) (row Vec) {
 }
 
 // SetRow sets the values of a row i to the values of a Vec v
+//
+// Parameters:
+//
+//	o *Mat - matrix to set row i of
+//	i int - row index
+//	v Vec - row values
+//
+// Returns:
+//
+//	none
 func (o *Mat) SetRow(i int, v Vec) {
 	if v.N != o.N {
 		panic(errRowLength)
@@ -129,7 +208,17 @@ func (o *Mat) SetRow(i int, v Vec) {
 	}
 }
 
-// SwapRows sets the values of a row i to the values of a row j
+// SwapRows swaps row i with row j
+//
+// Parameters:
+//
+//	o *Mat - matrix to swap rows i and j of
+//	i int - row index
+//	j int - row index
+//
+// Returns:
+//
+//	none
 func (o *Mat) SwapRows(i, j int) {
 	if o.M <= i {
 		panic(errRowAccess)
@@ -142,18 +231,25 @@ func (o *Mat) SwapRows(i, j int) {
 	o.SetRow(j, tmp)
 }
 
-// Largest returns the largest component |a[ij]| of this matrix and it's index
+// Largest returns the largest element in this matrix
 //
-//	largest := |a[ij]|
-func (o *Mat) Largest() (largest float64, idx int) {
+// Parameters:
+//
+//	o *Mat - matrix to find largest element of
+//
+// Returns:
+//
+//	val float64 - the largest element in this matrix
+//	idx int - the index of the largest element in this matrix
+func (o *Mat) Largest() (val float64, idx int) {
 	if o.M < 1 || o.N < 1 {
 		panic(errNegativeDimension)
 	}
-	largest = math.Abs(o.Data[0])
+	val = math.Abs(o.Data[0])
 	for k := 1; k < o.M*o.N; k++ {
 		tmp := math.Abs(o.Data[k])
-		if tmp > largest {
-			largest = tmp
+		if tmp > val {
+			val = tmp
 			idx = k
 		}
 	}

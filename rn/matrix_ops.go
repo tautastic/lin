@@ -1,5 +1,7 @@
 package rn
 
+import "github.com/add1609/lin/scalar"
+
 // BackSubstitution takes an upper triangular matrix and returns it's solution vector x
 func (o *Mat) BackSubstitution() (x Vec) {
 	uN := o.N - 1
@@ -14,7 +16,7 @@ func (o *Mat) BackSubstitution() (x Vec) {
 				yI -= uIJ * x.Get(j)
 			}
 		}
-		x.Set(i, roundTo(yI/uII, 13))
+		x.Set(i, scalar.RoundTo(yI/uII, 13))
 	}
 	return
 }
