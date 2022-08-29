@@ -16,7 +16,7 @@ func (o Plane) String() (str string) {
 	return
 }
 
-// MakePlane returns a Plane object that passes through the given points
+// MakePlaneByPoints returns a plane that passes through the given points
 //
 // Parameters:
 //
@@ -26,11 +26,29 @@ func (o Plane) String() (str string) {
 //
 // Returns:
 //
-//	plane Plane - The plane passing through the given points
-func MakePlane(P1, P2, P3 rn.Vec) (plane Plane) {
+//	Plane - The plane that passes through the given points
+func MakePlaneByPoints(P1, P2, P3 rn.Vec) (plane Plane) {
 	plane.A = P1
 	plane.B = P2.Sub(P1)
 	plane.C = P3.Sub(P1)
+	return
+}
+
+// MakePlaneByVec returns a plane that passes through the given point and has directions D1 and D2
+//
+// Parameters:
+//
+//	P rn.Vec - The point
+//	D1 rn.Vec - The first direction
+//	D2 rn.Vec - The second direction
+//
+// Returns:
+//
+//	Plane - The plane that passes through the given point and has directions D1 and D2
+func MakePlaneByVec(P, D1, D2 rn.Vec) (plane Plane) {
+	plane.A = P
+	plane.B = D1
+	plane.C = D2
 	return
 }
 

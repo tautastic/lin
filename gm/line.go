@@ -15,7 +15,7 @@ func (o Line) String() (str string) {
 	return
 }
 
-// MakeLine returns a Line object that passes through the given points
+// MakeLineByPoints returns a Line object that passes through the given points
 //
 // Parameters:
 //
@@ -24,10 +24,26 @@ func (o Line) String() (str string) {
 //
 // Returns:
 //
-//	line Line - The line passing through the given points
-func MakeLine(P1, P2 rn.Vec) (line Line) {
+//	line Line - The line that passes through the given points
+func MakeLineByPoints(P1, P2 rn.Vec) (line Line) {
 	line.A = P1
 	line.B = P2.Sub(P1)
+	return
+}
+
+// MakeLineByVec returns a Line object that passes through the given point with direction D
+//
+// Parameters:
+//
+//	P rn.Vec - The point
+//	D rn.Vec - The direction
+//
+// Returns:
+//
+//	line Line - The line that passes through the given point with direction D
+func MakeLineByVec(P, D rn.Vec) (line Line) {
+	line.A = P
+	line.B = D
 	return
 }
 
@@ -45,7 +61,7 @@ func (o *Line) Equal(q Line) bool {
 	return o.A.Equal(q.A) && o.B.Equal(q.B)
 }
 
-// IntersectPlane returns the intersection point of a plane and a line
+// IntersectPlane returns the intersection point of a line and a plane
 //
 // Parameters:
 //
