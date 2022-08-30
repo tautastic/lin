@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/add1609/lin/errors"
 	"github.com/add1609/lin/scalar"
 )
 
@@ -20,7 +21,10 @@ func (o Vec) String() (str string) {
 			str += fmt.Sprintf("%v, ", scalar.RoundTo(o.X[i], 4))
 		}
 	}
-	str += fmt.Sprintf("%v]", scalar.RoundTo(o.X[o.N-1], 4))
+	str += fmt.Sprintf("%v", scalar.RoundTo(o.X[o.N-1], 4))
+	if o.N > 1 {
+		str += "]"
+	}
 	return
 }
 
@@ -36,7 +40,7 @@ func (o Vec) String() (str string) {
 //	vec Vec - Vec object with dimension n and all elements set to val
 func MakeVec(n int, val float64) (vec Vec) {
 	if n < 1 {
-		panic(errNegativeDimension)
+		panic(errors.ErrNegativeDimension)
 	}
 	vec = Vec{N: n, X: make([]float64, n)}
 	if val != 0 {
@@ -62,7 +66,7 @@ func (o *Vec) Equal(q Vec) bool {
 		return false
 	}
 	if o.N < 1 || q.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	for i, v := range o.X {
 		if v != q.X[i] && !(math.IsNaN(v) || math.IsNaN(q.X[i])) {
@@ -83,7 +87,7 @@ func (o *Vec) Equal(q Vec) bool {
 //	val float64 - value of the element at index i
 func (o *Vec) Get(i int) (val float64) {
 	if o.N <= i {
-		panic(errVectorAccess)
+		panic(errors.ErrVectorAccess)
 	}
 	return o.X[i]
 }
@@ -100,7 +104,7 @@ func (o *Vec) Get(i int) (val float64) {
 // none
 func (o *Vec) Set(i int, val float64) {
 	if o.N <= i {
-		panic(errVectorAccess)
+		panic(errors.ErrVectorAccess)
 	}
 	o.X[i] = val
 }
@@ -116,7 +120,7 @@ func (o *Vec) Set(i int, val float64) {
 // none
 func (o *Vec) SetSlice(s []float64) {
 	if o.N < len(s) {
-		panic(errSliceLengthMismatch)
+		panic(errors.ErrSliceLengthMismatch)
 	}
 	copy(o.X, s)
 }
@@ -132,7 +136,7 @@ func (o *Vec) SetSlice(s []float64) {
 //	u Vec - absolute value of o
 func (o *Vec) Abs() (u Vec) {
 	if o.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
@@ -153,10 +157,10 @@ func (o *Vec) Abs() (u Vec) {
 //	u Vec - vector sum of o and q
 func (o *Vec) Add(q Vec) (u Vec) {
 	if o.N != q.N {
-		panic(errShape)
+		panic(errors.ErrShape)
 	}
 	if o.N < 1 || q.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
@@ -177,10 +181,10 @@ func (o *Vec) Add(q Vec) (u Vec) {
 //	u Vec - vector difference of o and q
 func (o *Vec) Sub(q Vec) (u Vec) {
 	if o.N != q.N {
-		panic(errShape)
+		panic(errors.ErrShape)
 	}
 	if o.N < 1 || q.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
@@ -201,7 +205,7 @@ func (o *Vec) Sub(q Vec) (u Vec) {
 //	u Vec - vector o scaled by s
 func (o *Vec) Scale(r float64) (u Vec) {
 	if o.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	u = Vec{N: o.N, X: make([]float64, o.N)}
 	for i := 0; i < len(u.X); i++ {
@@ -222,10 +226,10 @@ func (o *Vec) Scale(r float64) (u Vec) {
 //	d float64 - dot product of o and q
 func (o *Vec) Dot(q Vec) (d float64) {
 	if o.N != q.N {
-		panic(errShape)
+		panic(errors.ErrShape)
 	}
 	if o.N < 1 || q.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	for i := 0; i < o.N; i++ {
 		d += o.X[i] * q.X[i]
@@ -245,14 +249,14 @@ func (o *Vec) Dot(q Vec) (d float64) {
 //	u Vec - cross product of o and q
 func (o *Vec) Cross(q Vec) (u Vec) {
 	if o.N != q.N {
-		panic(errShape)
+		panic(errors.ErrShape)
 	}
 	if o.N < 1 || q.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	switch o.N {
 	default:
-		panic(errOrder)
+		panic(errors.ErrOrder)
 	case 3:
 		u = Vec{N: 3, X: make([]float64, 3)}
 		u.X[0] = (o.X[1] * q.X[2]) - (o.X[2] * q.X[1])
@@ -321,7 +325,7 @@ func (o *Vec) Cos(q Vec) (cos float64) {
 //	idx int - index of the largest element of o
 func (o *Vec) Largest(begin, end int) (val float64, idx int) {
 	if o.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	val = math.Abs(o.X[begin])
 	idx = begin

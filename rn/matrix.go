@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/add1609/lin/errors"
 	"github.com/add1609/lin/scalar"
 )
 
@@ -46,7 +47,7 @@ func (o Mat) String() (str string) {
 //	mat Mat - a new matrix with m rows and n columns and all elements set to val
 func MakeMat(m, n int, val float64) (mat Mat) {
 	if m < 1 || n < 1 {
-		panic(errNegativeDimension)
+		panic(errors.ErrNegativeDimension)
 	}
 	mat = Mat{M: m, N: n, Data: make([]float64, m*n)}
 	if val != 0 {
@@ -68,7 +69,7 @@ func MakeMat(m, n int, val float64) (mat Mat) {
 //	clone Mat - a copy of this matrix
 func (o *Mat) GetCopy() (clone Mat) {
 	if o.M < 1 || o.N < 1 {
-		panic(errZeroLengthVec)
+		panic(errors.ErrZeroLengthVec)
 	}
 	clone = MakeMat(o.M, o.N, 0)
 	copy(clone.Data, o.Data)
@@ -88,10 +89,10 @@ func (o *Mat) GetCopy() (clone Mat) {
 //	val float64 - the value at A[i][j]
 func (o *Mat) Get(i, j int) (val float64) {
 	if o.M <= i {
-		panic(errRowAccess)
+		panic(errors.ErrRowAccess)
 	}
 	if o.N <= j {
-		panic(errColAccess)
+		panic(errors.ErrColAccess)
 	}
 	return o.Data[i+j*o.M]
 }
@@ -110,10 +111,10 @@ func (o *Mat) Get(i, j int) (val float64) {
 //	none
 func (o *Mat) Set(i, j int, val float64) {
 	if o.M <= i {
-		panic(errRowAccess)
+		panic(errors.ErrRowAccess)
 	}
 	if o.N <= j {
-		panic(errColAccess)
+		panic(errors.ErrColAccess)
 	}
 	o.Data[i+j*o.M] = val
 }
@@ -130,7 +131,7 @@ func (o *Mat) Set(i, j int, val float64) {
 //	col Vec - column j of this matrix
 func (o *Mat) GetCol(j int) (col Vec) {
 	if o.N <= j {
-		panic(errColAccess)
+		panic(errors.ErrColAccess)
 	}
 	col = Vec{N: o.M, X: make([]float64, o.M)}
 	copy(col.X, o.Data[j*o.M:(j+1)*o.M])
@@ -150,10 +151,10 @@ func (o *Mat) GetCol(j int) (col Vec) {
 //	none
 func (o *Mat) SetCol(j int, v Vec) {
 	if v.N != o.M {
-		panic(errColLength)
+		panic(errors.ErrColLength)
 	}
 	if o.N <= j {
-		panic(errColAccess)
+		panic(errors.ErrColAccess)
 	}
 	copy(o.Data[j*o.M:(j+1)*o.M], v.X)
 }
@@ -170,10 +171,10 @@ func (o *Mat) SetCol(j int, v Vec) {
 //	row Vec - row i of this matrix
 func (o *Mat) GetRow(i int) (row Vec) {
 	if o.M < 1 || o.N < 1 {
-		panic(errNegativeDimension)
+		panic(errors.ErrNegativeDimension)
 	}
 	if o.M <= i {
-		panic(errRowAccess)
+		panic(errors.ErrRowAccess)
 	}
 	row = Vec{N: o.N, X: make([]float64, o.N)}
 	for j := 0; j < o.N; j++ {
@@ -195,13 +196,13 @@ func (o *Mat) GetRow(i int) (row Vec) {
 //	none
 func (o *Mat) SetRow(i int, v Vec) {
 	if v.N != o.N {
-		panic(errRowLength)
+		panic(errors.ErrRowLength)
 	}
 	if o.M <= i {
-		panic(errRowAccess)
+		panic(errors.ErrRowAccess)
 	}
 	if o.M < 1 || o.N < 1 {
-		panic(errNegativeDimension)
+		panic(errors.ErrNegativeDimension)
 	}
 	for j := 0; j < o.N; j++ {
 		o.Data[i+j*o.M] = v.Get(j)
@@ -221,10 +222,10 @@ func (o *Mat) SetRow(i int, v Vec) {
 //	none
 func (o *Mat) SwapRows(i, j int) {
 	if o.M <= i {
-		panic(errRowAccess)
+		panic(errors.ErrRowAccess)
 	}
 	if o.N <= j {
-		panic(errColAccess)
+		panic(errors.ErrColAccess)
 	}
 	tmp := o.GetRow(i)
 	o.SetRow(i, o.GetRow(j))
@@ -243,7 +244,7 @@ func (o *Mat) SwapRows(i, j int) {
 //	idx int - the index of the largest element in this matrix
 func (o *Mat) Largest() (val float64, idx int) {
 	if o.M < 1 || o.N < 1 {
-		panic(errNegativeDimension)
+		panic(errors.ErrNegativeDimension)
 	}
 	val = math.Abs(o.Data[0])
 	for k := 1; k < o.M*o.N; k++ {

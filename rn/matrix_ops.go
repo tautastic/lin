@@ -1,16 +1,19 @@
 package rn
 
-import "github.com/add1609/lin/scalar"
+import (
+	"github.com/add1609/lin/errors"
+	"github.com/add1609/lin/scalar"
+)
 
 // BackSubstitution returns the solution vector x of an upper triangular matrix
 //
 // Parameters:
 //
-//	o *Mat - an upper triangular matrix
+//	o *Mat - An upper triangular matrix
 //
 // Returns:
 //
-//	x Vec - the solution vector x
+//	x Vec - The solution vector x
 func (o *Mat) BackSubstitution() (x Vec) {
 	uN := o.N - 1
 	x = MakeVec(uN, 0)
@@ -33,18 +36,29 @@ func (o *Mat) BackSubstitution() (x Vec) {
 //
 // Parameters:
 //
-//	o *Mat - an upper triangular matrix
+//	o *Mat - An upper triangular matrix
 //
 // Returns:
 //
-//	mat Mat - the modified matrix
-//	x Vec - the solution vector x
-func (o *Mat) GaussSolve() (mat Mat, x Vec) {
+//	mat Mat - The modified matrix
+//	x Vec - The solution vector x
+//	err error - An error if one occurred
+func (o *Mat) GaussSolve() (mat Mat, x Vec, err error) {
 	var rowPivot, colPivot int
 	mat = o.GetCopy()
+
 	if o.N < o.M {
-		panic(errShape)
+		err = errors.ErrShape
+		return
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			err = r.(errors.Error)
+			return
+		}
+	}()
+
 	for {
 		if mat.N-1 < colPivot || mat.M-1 < rowPivot {
 			x = mat.BackSubstitution()

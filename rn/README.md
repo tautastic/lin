@@ -1,10 +1,10 @@
 
-# lin. rn. Linear algebra in ![\Huge\mathbb{R}^{n}](https://latex.codecogs.com/svg.latex?\Huge\mathbb{R}^{n})
+# lin. rn. Linear algebra in <img src="https://bit.ly/3KLDB5L"/>
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/add1609/lin/rn.svg)](https://pkg.go.dev/github.com/add1609/lin/rn)
 
 The `rn` package provides a set of algorithms and data structures for linear algebra in
-![\Large\mathbb{R}^{n}](https://latex.codecogs.com/svg.latex?\Huge\mathbb{R}^{n})
+<img src="https://bit.ly/3wIZgFQ"/>
 
 ## API
 

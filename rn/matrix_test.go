@@ -145,7 +145,10 @@ func TestMatGaussSolve(t *testing.T) {
 			Vec{N: 4, X: []float64{-0.5556995200839, 0.9762349711047, -1.017857257634, 1.4226137805486}},
 		},
 	} {
-		_, gotX := test.m.GaussSolve()
+		_, gotX, err := test.m.GaussSolve()
+		if err != nil {
+			t.Errorf("error:\n%v\n", err)
+		}
 		if !gotX.Equal(test.want) {
 			t.Errorf(
 				"error:\ngot=%v\nwant=%v",
